@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000";
+const API_URL = "https://standup-ai.onrender.com";
 
 let currentResult = null;
 let currentType = "notes";
