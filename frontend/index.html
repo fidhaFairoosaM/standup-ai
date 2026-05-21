@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StandupAI — Daily Work Generator</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <div class="brand-icon">⚡</div>
+      <span class="brand-name">Standup<span class="brand-ai">AI</span></span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-date" id="nav-date"></span>
+      <a class="nav-gh" href="https://github.com/fidhaFairoosaM/standup-ai" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+  <section class="hero">
+    <div class="hero-pill">Built for developers & working professionals</div>
+    <h1 class="hero-title">Stop dreading daily updates.<br><span class="title-accent">Start owning them.</span></h1>
+    <p class="hero-sub">Paste your messy notes, commits, or Slack messages — get a clean, structured work update grouped by project in seconds.</p>
+  </section>
+
+  <div class="app-grid">
+    <!-- INPUT PANEL -->
+    <div class="panel input-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Yesterday's work</h2>
+        <div class="input-type-tabs">
+          <button class="type-tab active" data-type="notes" onclick="setType('notes')">📝 Notes</button>
+          <button class="type-tab" data-type="commits" onclick="setType('commits')">🔀 Commits</button>
+          <button class="type-tab" data-type="slack" onclick="setType('slack')">💬 Slack</button>
+        </div>
+      </div>
+      <textarea id="raw-input" class="raw-input" placeholder="Mention your projects naturally:
+
+Website: fixed login bug, pushed to staging
+Mobile App: reviewed PRs, gave feedback on payment flow
+Also had sync with design team"></textarea>
+
+      <div class="samples-row">
+        <span class="samples-label">Try a sample:</span>
+        <button class="sample-btn" onclick="loadSample('dev')">Multi-project</button>
+        <button class="sample-btn" onclick="loadSample('commits')">Git commits</button>
+        <button class="sample-btn" onclick="loadSample('pm')">PM/non-dev</button>
+      </div>
+
+      <div class="context-row">
+        <input id="team-context" type="text" class="context-input" placeholder="Team context (optional) — e.g. sprint 14, launching next Friday"/>
+      </div>
+
+      <button class="generate-btn" id="gen-btn" onclick="generate()">
+        <span id="gen-text">⚡ Generate Standup</span>
+        <span id="gen-loader" class="hidden"><span class="spinner"></span> Generating...</span>
+      </button>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="panel output-panel" id="output-panel">
+      <div class="output-empty" id="output-empty">
+        <div class="empty-icon">🎯</div>
+        <p>Your standup will appear here</p>
+        <span>Grouped by project automatically</span>
+      </div>
+
+      <div class="output-content hidden" id="output-content">
+        <div class="output-header">
+          <div class="output-meta">
+            <span class="mood-badge" id="mood-badge"></span>
+            <div class="tags-row" id="tags-row"></div>
+          </div>
+          <div class="output-actions">
+            <button class="action-btn" onclick="copyStandup()">📋 Copy</button>
+            <button class="action-btn" onclick="saveToLog()">💾 Save</button>
+          </div>
+        </div>
+        <div class="highlight-box" id="highlight-box"></div>
+        <div id="projects-output"></div>
+        <div class="copy-ready-box">
+          <div class="copy-ready-label">📤 Ready to paste in Slack / Teams</div>
+          <pre class="copy-ready-text" id="copy-ready-text"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORK LOG -->
+  <div class="worklog-section">
+    <div class="worklog-header">
+      <div>
+        <h2 class="worklog-title">📅 Work Log</h2>
+        <p class="worklog-sub">Save daily standups — generate your weekly summary at end of week</p>
+      </div>
+      <button class="weekly-btn" id="weekly-btn" onclick="generateWeekly()" style="display:none">
+        <span id="weekly-text">📊 Generate Weekly Summary</span>
+        <span id="weekly-loader" class="hidden"><span class="spinner"></span></span>
+      </button>
+    </div>
+    <div class="log-empty" id="log-empty">
+      <p>No entries yet — generate a standup and hit "Save" to start your log</p>
+    </div>
+    <div class="log-list" id="log-list"></div>
+
+    <div class="weekly-output hidden" id="weekly-output">
+      <div class="weekly-card">
+        <h3 class="weekly-card-title">🏆 This week's summary</h3>
+        <p class="weekly-overall" id="weekly-overall"></p>
+        <div id="weekly-projects"></div>
+        <div class="weekly-footer">
+          <div class="productivity-score">
+            <span class="score-label">Productivity</span>
+            <div class="score-bar"><div class="score-fill" id="weekly-score-fill"></div></div>
+            <span class="score-num" id="weekly-score-num"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <p>Built with ❤️ using <strong>FastAPI</strong> + <strong>Claude AI</strong> &nbsp;·&nbsp; <a href="https://github.com/fidhaFairoosaM/standup-ai" target="_blank">View on GitHub</a></p>
+</footer>
+
+<div class="toast hidden" id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
